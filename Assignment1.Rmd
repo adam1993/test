@@ -1,6 +1,6 @@
 ---
 title: "Assignment 1"
-author: "Adam Qian"
+author: "Adam(Yifu) Qian"
 date: "April 30, 2017"
 output:
   beamer_presentation: default
