@@ -1,0 +1,89 @@
+---
+title: "Assignment 1"
+author: "Adam Qian"
+date: "April 30, 2017"
+output:
+  beamer_presentation: default
+  slidy_presentation: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1) Import the climate data. 
+```{r ClimateData}
+ClimateData = read.table("D:/Yifu Qian's love/UCSB Learning/2016 -2017 Spring Quarter/Environmental Informatics/test2/clim.txt", header=TRUE)
+summary(ClimateData)
+```
+
+2) Graph precipitation and average temperature by month, using a box plot.
+
+Add a average temperature column to the data.
+```{r AddMeanTemperature, echo = TRUE, eval=TRUE}
+MeanTemp = (ClimateData$tmin + ClimateData$tmax)/2
+ClimateData$tmean = MeanTemp
+```
+
+Using boxplot.
+```{r BoxPlot for precipitation and average temperature by month, echo = TRUE, eval=TRUE}
+
+boxplot(data = ClimateData, tmean ~ month, main = "Climate Data: Mean Temperature Grouped by Months", xlab = "Month", ylab = "Mean Temperature")
+boxplot(data = ClimateData, rain ~ month, main = "Climate Data: Precipitation Grouped by Months", xlab = "Month", ylab = "Precipitation")
+```
+
+3) Find the wettest and dryest year.
+```{r sum precipitation within years, echo = TRUE, eval=TRUE}
+rain.yr = aggregate(ClimateData$rain, by=list(ClimateData$year), sum)
+colnames(rain.yr) = c("Year", "AnnualPrecipitation")
+```
+```{r find the wettest and dryest year}
+WetYear = which.max(rain.yr$AnnualPrecipitation)
+rain.yr[WetYear,]
+
+DryYear = which.min(rain.yr$AnnualPrecipitation)
+rain.yr[DryYear,]
+```
+Therefore, the wettest and the dryest year are 1982 and 2013 respectively.
+
+4) Add two photos to show wet year and dry year.
+<div align="center"> <img src="../test2/WetYear.jpeg" height=300>
+![Wet Year](D:/Yifu Qian's love/UCSB Learning/2016 -2017 Spring Quarter/Environmental Informatics/test2/WetYear.jpeg)
+
+<div align="center"> <img src="../test2/DryYear.jpg" height=400>
+![Dry Year](D:/Yifu Qian's love/UCSB Learning/2016 -2017 Spring Quarter/Environmental Informatics/test2/DryYear.jpg)
+
+5) Create a new "season" variable
+```{r season variable creation}
+ClimateData$Season = ifelse(ClimateData$month %in% c(11,12,1),4, 
+                            ifelse(ClimateData$month %in% c(2,3,4),1,
+                                   ifelse(ClimateData$month %in% c(5,6,7),2,3)))
+```
+
+6) Find wettest and driest seasons
+```{r find the wettest and dryest season}
+rain.onlyseason = aggregate(ClimateData$rain, by=list(ClimateData$Season), sum)
+
+WetSeason = which.max(rain.onlyseason$x)
+rain.onlyseason[WetSeason,]
+
+DrySeason = which.min(rain.onlyseason$x)
+rain.onlyseason[DrySeason,]
+```
+
+Therefore, the wettest season is winter and the dryest season is summer. 
+
+7) Plot the relationship between winter precipitation and summer temperature
+```{r Plot the relationship between winter precipitation and summer temperature}
+rain.season = aggregate(ClimateData$rain, by=list(ClimateData$Season, ClimateData$year), sum) 
+temp.season = aggregate(ClimateData$tmean,by=list(ClimateData$Season, ClimateData$year), mean)
+
+plot(rain.season$x[rain.season$Group.1 == "4"] ~ temp.season$x[temp.season$Group.1 == "2"], main = "Winter Precipitation v.s. Summer Temperature", xlab = "Summer Temperature", ylab = "Winter Precipitation")
+```
+
+The plot shows that there not strong correlation between winter precipitation and summer temperature. Their relationship looks random.
+
+Positive (negative) precipiation anomalies during winter could be associated with wetter (drier) soils, a later (earlier) date of snowmelt, cooler (warmer) air temperatures, and more (less) evaporation during spring and summer.
+
+
+
